@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #00e676;
+    --green-dark: #00a152;
+    --red: #ff1744;
+    --amber: #ffd600;
+    --bg: #0d0f14;
+    --surface: #161a22;
+    --surface2: #1e2430;
+    --border: rgba(255,255,255,0.07);
+    --text: #f0f2f7;
+    --muted: #5a6070;
+    --radius: 12px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 2px;
+    color: var(--green);
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo svg { width: 28px; height: 28px; }
+  .nav-tabs {
+    display: flex;
+    gap: 0;
+    margin-left: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .nav-tab {
+    background: none;
+    border: none;
+    color: var(--muted);
+    padding: 7px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .nav-tab.active { background: var(--green); color: #000; }
+  .nav-tab:not(.active):hover { background: var(--surface2); color: var(--text); }
+
+  /* MAIN */
+  main { padding: 2rem; max-width: 1100px; margin: 0 auto; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* SQUAD */
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .toolbar input, .toolbar select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 8px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .toolbar input { flex: 1; min-width: 160px; }
+  .toolbar input:focus, .toolbar select:focus { border-color: var(--green); }
+  .toolbar select option { background: var(--surface2); }
+  .btn {
+    background: var(--green);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background .2s, transform .1s;
+    white-space: nowrap;
+  }
+  .btn:hover { background: #00ff88; }
+  .btn:active { transform: scale(.97); }
+  .btn-sm {
+    padding: 5px 12px;
+    font-size: 12px;
+    border-radius: 6px;
+  }
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); border-color: rgba(255,255,255,0.15); }
+  .btn-danger { background: var(--red); color: #fff; }
+  .btn-danger:hover { background: #ff4569; }
+
+  /* PLAYER GRID */
+  .player-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+  }
+  .player-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: border-color .2s, transform .15s;
+    position: relative;
+  }
+  .player-card:hover { border-color: rgba(0,230,118,0.35); transform: translateY(-2px); }
+  .avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 500;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid var(--border);
+  }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+  .p-name { font-size: 14px; font-weight: 500; color: var(--text); text-align: center; }
+  .p-meta { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .pos-badge {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 20px;
+    letter-spacing: .5px;
+  }
+  .pos-GK  { background: #0C447C22; color: #85B7EB; border: 1px solid #0C447C44; }
+  .pos-DEF { background: #27500A22; color: #97C459; border: 1px solid #27500A44; }
+  .pos-MID { background: #63380622; color: #EF9F27; border: 1px solid #63380644; }
+  .pos-FWD { background: #79141422; color: #F09595; border: 1px solid #79141444; }
+  .fee-pill {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 20px;
+    cursor: default;
+  }
+  .fee-pill.all  { background: #00a15222; color: var(--green); border: 1px solid #00a15244; }
+  .fee-pill.part { background: #ffd60022; color: var(--amber); border: 1px solid #ffd60044; }
+  .fee-pill.none { background: #ff174422; color: #ff8a80; border: 1px solid #ff174444; }
+  .p-contact { font-size: 11px; color: var(--muted); }
+  .card-actions { display: flex; gap: 6px; margin-top: 4px; }
+  .icon-btn {
+    width: 28px; height: 28px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    transition: all .15s;
+    font-size: 14px;
+  }
+  .icon-btn:hover { background: var(--surface); color: var(--text); border-color: rgba(255,255,255,0.2); }
+  .icon-btn.danger:hover { color: var(--red); border-color: var(--red); }
+  .empty-state {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 4rem;
+    color: var(--muted);
+  }
+  .empty-state svg { width: 48px; height: 48px; margin: 0 auto 12px; display: block; opacity: .4; }
+
+  /* STATS ROW */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--text); letter-spacing: 1px; }
+  .stat-val.green { color: var(--green); }
+  .stat-val.red   { color: #ff8a80; }
+  .stat-val.amber { color: var(--amber); }
+  .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* FEE TABLE */
+  .fee-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+  .fee-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .fee-table th {
+    text-align: left;
+    padding: 10px 14px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .fee-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  .fee-table tr:last-child td { border-bottom: none; }
+  .fee-table tr:hover td { background: var(--surface2); }
+  .toggle-fee-btn {
+    background: none;
+    border: 1px solid;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .15s;
+  }
+  .toggle-fee-btn.paid   { border-color: #00a15244; color: var(--green); background: #00a15215; }
+  .toggle-fee-btn.unpaid { border-color: #ff174444; color: #ff8a80; background: #ff174415; }
+  .toggle-fee-btn:hover  { opacity: .75; }
+
+  /* YEAR VIEW */
+  .year-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
+  .year-section h3 { font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: .8px; }
+  .year-row {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .year-player { display: flex; align-items: center; gap: 6px; overflow: hidden; }
+  .year-player span { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
+  .months-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; }
+  .mbox {
+    height: 22px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    cursor: pointer;
+    color: var(--muted);
+    background: var(--surface2);
+    transition: all .15s;
+    font-weight: 500;
+    letter-spacing: .3px;
+  }
+  .mbox:hover { border-color: rgba(255,255,255,0.2); }
+  .mbox.paid   { background: #00a15222; color: var(--green); border-color: #00a15244; }
+  .mbox.unpaid { background: #ff174422; color: #ff8a80; border-color: #ff174444; }
+  .mbox.future { opacity: .25; cursor: default; pointer-events: none; }
+
+  /* MODAL */
+  .modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.65);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    width: 400px;
+    max-width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal h2 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1.5px; color: var(--green); margin-bottom: 1.25rem; }
+  .photo-upload {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    border: 2px dashed var(--border);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    margin: 0 auto 1.25rem;
+    color: var(--muted);
+    font-size: 11px;
+    gap: 4px;
+    transition: border-color .2s;
+  }
+  .photo-upload:hover { border-color: var(--green); }
+  .photo-upload img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .field { margin-bottom: 12px; }
+  .field label { font-size: 11px; color: var(--muted); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .6px; }
+  .field input, .field select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 9px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .field input:focus, .field select:focus { border-color: var(--green); }
+  .field select option { background: var(--surface2); }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; }
+
+  /* MONTH FILTER */
+  .month-filter { display: flex; gap: 8px; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .month-filter select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 8px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+  }
+  .month-filter select:focus { border-color: var(--green); }
+  .hint { font-size: 12px; color: var(--muted); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="16" cy="16" r="14" stroke="#00e676" stroke-width="2"/>
+      <path d="M16 4 L19 12 L27 12 L21 17 L23 25 L16 20 L9 25 L11 17 L5 12 L13 12 Z" fill="#00e676" opacity=".85"/>
+    </svg>
+    SQUAD
+  </div>
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('squad',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/></svg>
+      Squad
+    </button>
+    <button class="nav-tab" onclick="showTab('fees',this)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      Fees
+    </button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- SQUAD SECTION -->
+  <div id="squad" class="section active">
+    <div class="toolbar">
+      <input type="text" id="search" placeholder="Search name or number…" oninput="renderSquad()">
+      <select id="posF" onchange="renderSquad()">
+        <option value="">All positions</option>
+        <option>GK</option><option>DEF</option><option>MID</option><option>FWD</option>
+      </select>
+      <select id="feeF" onchange="renderSquad()">
+        <option value="">All status</option>
+        <option value="all">All paid</option>
+        <option value="part">Partial</option>
+        <option value="none">None paid</option>
+      </select>
+      <button class="btn" onclick="openAdd()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Player
+      </button>
+    </div>
+    <div class="player-grid" id="player-grid"></div>
+  </div>
+
+  <!-- FEES SECTION -->
+  <div id="fees" class="section">
+    <div class="stats-row" id="stats"></div>
+    <div class="month-filter">
+      <select id="monthSel" onchange="renderFees()"></select>
+      <span class="hint">Click paid/unpaid to toggle</span>
+    </div>
+    <div class="fee-wrap">
+      <table class="fee-table">
+        <thead>
+          <tr>
+            <th style="width:42px">#</th>
+            <th style="width:44px"></th>
+            <th>Player</th>
+            <th style="width:60px">Pos</th>
+            <th style="width:90px">Amount</th>
+            <th style="width:100px">Status</th>
+          </tr>
+        </thead>
+        <tbody id="fee-body"></tbody>
+      </table>
+    </div>
+    <div class="year-section">
+      <h3>Full year — 2026</h3>
+      <div id="year-view"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h2 id="modal-title">Add Player</h2>
+    <div class="photo-upload" id="photo-wrap" onclick="document.getElementById('photo-input').click()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      <span>Add photo</span>
+    </div>
+    <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhoto(event)">
+    <div class="form-row">
+      <div class="field" style="grid-column:1/-1">
+        <label>Full name *</label>
+        <input id="f-name" type="text" placeholder="e.g. Ahmed Al-Rashid">
+      </div>
+      <div class="field">
+        <label>Jersey #</label>
+        <input id="f-num" type="number" min="1" max="99" placeholder="e.g. 10">
+      </div>
+      <div class="field">
+        <label>Position</label>
+        <select id="f-pos">
+          <option>GK</option><option>DEF</option><option selected>MID</option><option>FWD</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Phone</label>
+        <input id="f-phone" type="tel" placeholder="+81 90-0000-0000">
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input id="f-email" type="email" placeholder="player@email.com">
+      </div>
+      <div class="field" style="grid-column:1/-1">
+        <label>Monthly fee (¥)</label>
+        <input id="f-amount" type="number" min="0" placeholder="e.g. 3000">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-sm" onclick="savePlayer()">Save Player</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const YEAR = 2026;
+const NOW_MONTH = 5;
+
+const AV_BG  = ['#0C447C','#27500A','#633806','#791F1F','#3C3489','#085041','#72243E','#854F0B','#444441'];
+const AV_TXT = ['#85B7EB','#97C459','#EF9F27','#F09595','#AFA9EC','#5DCAA5','#ED93B1','#FAC775','#B4B2A9'];
+
+let players = [
+  {id:1, name:'Yusuf Tanaka',   num:1,  pos:'GK',  phone:'090-1234-0001', email:'yusuf@mail.com',  amount:3000, photo:'', fees:{'2026-01':true,'2026-02':true,'2026-03':true,'2026-04':true,'2026-05':true}},
+  {id:2, name:'Omar Hassan',    num:4,  pos:'DEF', phone:'090-1234-0002', email:'omar@mail.com',   amount:3000, photo:'', fees:{'2026-01':true,'2026-02':true,'2026-03':true,'2026-04':true}},
+  {id:3, name:'Kenji Watanabe', num:5,  pos:'DEF', phone:'090-1234-0003', email:'kenji@mail.com',  amount:3000, photo:'', fees:{'2026-01':true,'2026-02':true,'2026-03':true}},
+  {id:4, name:'Lucas Ferreira', num:8,  pos:'MID', phone:'090-1234-0004', email:'lucas@mail.com',  amount:3000, photo:'', fees:{'2026-01':true,'2026-02':true,'2026-03':true,'2026-04':true,'2026-05':true}},
+  {id:5, name:'Arjun Mehta',    num:10, pos:'FWD', phone:'090-1234-0005', email:'arjun@mail.com',  amount:3000, photo:'', fees:{}},
+];
+let nextId = 20, editId = null, pendingPhoto = '';
+
+function mk(m) { return `${YEAR}-${String(m).padStart(2,'0')}`; }
+function initials(n) { return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
+function ci(id) { return id % AV_BG.length; }
+
+function feeStatus(p) {
+  const paid = Object.keys(p.fees||{}).filter(k=>p.fees[k]).length;
+  if (paid === 0) return 'none';
+  if (paid >= NOW_MONTH) return 'all';
+  return 'part';
+}
+function feeLabel(p) {
+  const paid = Object.keys(p.fees||{}).filter(k=>p.fees[k]).length;
+  const s = feeStatus(p);
+  if (s==='all')  return {cls:'all',  txt:'All paid'};
+  if (s==='none') return {cls:'none', txt:'Unpaid'};
+  return {cls:'part', txt:`${paid}/${NOW_MONTH} months`};
+}
+
+function avatarEl(p, size=64) {
+  const i = ci(p.id);
+  if (p.photo) return `<div class="avatar" style="width:${size}px;height:${size}px"><img src="${p.photo}" alt=""></div>`;
+  return `<div class="avatar" style="width:${size}px;height:${size}px;background:${AV_BG[i]}22;border-color:${AV_BG[i]}44;color:${AV_TXT[i]};font-size:${size>40?Math.round(size/3.2):10}px">${initials(p.name)}</div>`;
+}
+
+function renderSquad() {
+  const q   = document.getElementById('search').value.toLowerCase();
+  const pf  = document.getElementById('posF').value;
+  const ff  = document.getElementById('feeF').value;
+  const list = players.filter(p =>
+    (!q  || p.name.toLowerCase().includes(q) || String(p.num).includes(q)) &&
+    (!pf || p.pos === pf) &&
+    (!ff || feeStatus(p) === ff)
+  );
+  const g = document.getElementById('player-grid');
+  if (!list.length) {
+    g.innerHTML = `<div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><line x1="18" y1="10" x2="22" y2="10"/></svg>
+      <div>No players found</div>
+    </div>`;
+    return;
+  }
+  g.innerHTML = list.map(p => {
+    const fl = feeLabel(p);
+    return `<div class="player-card" onclick="openEdit(${p.id})">
+      ${avatarEl(p, 64)}
+      <div class="p-name">${p.name}</div>
+      <div class="p-meta">#${p.num} &nbsp;<span class="pos-badge pos-${p.pos}">${p.pos}</span></div>
+      <span class="fee-pill ${fl.cls}">${fl.txt}</span>
+      ${p.phone ? `<div class="p-contact">${p.phone}</div>` : ''}
+      <div class="card-actions" onclick="event.stopPropagation()">
+        <button class="icon-btn" onclick="openEdit(${p.id})" title="Edit">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
+        </button>
+        <button class="icon-btn danger" onclick="delPlayer(${p.id})" title="Delete">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function buildMonthSel() {
+  const sel = document.getElementById('monthSel');
+  sel.innerHTML = '';
+  for (let m = 1; m <= NOW_MONTH; m++) {
+    const o = document.createElement('option');
+    o.value = mk(m);
+    o.textContent = `${MONTHS[m-1]} ${YEAR}`;
+    if (m === NOW_MONTH) o.selected = true;
+    sel.appendChild(o);
+  }
+}
+
+function renderFees() {
+  const key = document.getElementById('monthSel').value;
+  const paid = players.filter(p => p.fees && p.fees[key]);
+  const unpaid = players.filter(p => !p.fees || !p.fees[key]);
+  const collected = paid.reduce((a,p) => a + (Number(p.amount)||0), 0);
+  const pending   = unpaid.reduce((a,p) => a + (Number(p.amount)||0), 0);
+
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-card"><div class="stat-val">${players.length}</div><div class="stat-lbl">Players</div></div>
+    <div class="stat-card"><div class="stat-val green">${paid.length}</div><div class="stat-lbl">Paid</div></div>
+    <div class="stat-card"><div class="stat-val red">${unpaid.length}</div><div class="stat-lbl">Unpaid</div></div>
+    <div class="stat-card"><div class="stat-val green">¥${collected.toLocaleString()}</div><div class="stat-lbl">Collected</div></div>
+    <div class="stat-card"><div class="stat-val amber">¥${pending.toLocaleString()}</div><div class="stat-lbl">Pending</div></div>`;
+
+  const sorted = [...players].sort((a,b) => a.name.localeCompare(b.name));
+  document.getElementById('fee-body').innerHTML = sorted.map(p => {
+    const isPaid = !!(p.fees && p.fees[key]);
+    return `<tr>
+      <td>#${p.num}</td>
+      <td>${avatarEl(p, 28)}</td>
+      <td style="font-weight:500">${p.name}</td>
+      <td><span class="pos-badge pos-${p.pos}">${p.pos}</span></td>
+      <td>¥${Number(p.amount||0).toLocaleString()}</td>
+      <td><button class="toggle-fee-btn ${isPaid?'paid':'unpaid'}" onclick="toggleMonth(${p.id},'${key}')">${isPaid ? '✓ Paid' : '✗ Unpaid'}</button></td>
+    </tr>`;
+  }).join('');
+
+  renderYearView();
+}
+
+function toggleMonth(id, key) {
+  const p = players.find(x => x.id === id);
+  if (!p) return;
+  if (!p.fees) p.fees = {};
+  p.fees[key] = !p.fees[key];
+  renderFees(); renderSquad();
+}
+
+function renderYearView() {
+  const sorted = [...players].sort((a,b) => a.name.localeCompare(b.name));
+  document.getElementById('year-view').innerHTML = sorted.map(p => {
+    const months = MONTHS.map((mn, i) => {
+      const key = mk(i+1);
+      const future = i+1 > NOW_MONTH;
+      const isPaid = !!(p.fees && p.fees[key]);
+      const cls = future ? 'future' : (isPaid ? 'paid' : 'unpaid');
+      const click = future ? '' : `onclick="toggleMonth(${p.id},'${key}')"`;
+      return `<div class="mbox ${cls}" ${click} title="${mn} ${YEAR}">${mn.slice(0,1)}</div>`;
+    }).join('');
+    return `<div class="year-row">
+      <div class="year-player">
+        ${avatarEl(p, 22)}
+        <span>${p.name.split(' ')[0]}</span>
+      </div>
+      <div class="months-grid">${months}</div>
+    </div>`;
+  }).join('');
+}
+
+function openAdd() {
+  editId = null; pendingPhoto = '';
+  clearForm();
+  document.getElementById('modal-title').textContent = 'Add Player';
+  document.getElementById('photo-wrap').innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Add photo</span>`;
+  document.getElementById('modal-backdrop').classList.add('open');
+}
+function openEdit(id) {
+  editId = id;
+  const p = players.find(x => x.id === id);
+  pendingPhoto = p.photo || '';
+  document.getElementById('f-name').value   = p.name;
+  document.getElementById('f-num').value    = p.num;
+  document.getElementById('f-pos').value    = p.pos;
+  document.getElementById('f-phone').value  = p.phone || '';
+  document.getElementById('f-email').value  = p.email || '';
+  document.getElementById('f-amount').value = p.amount || '';
+  document.getElementById('modal-title').textContent = 'Edit Player';
+  const pw = document.getElementById('photo-wrap');
+  pw.innerHTML = p.photo
+    ? `<img src="${p.photo}" style="width:80px;height:80px;object-fit:cover;border-radius:50%" alt="">`
+    : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Add photo</span>`;
+  document.getElementById('modal-backdrop').classList.add('open');
+}
+function closeModal() { document.getElementById('modal-backdrop').classList.remove('open'); }
+function clearForm() {
+  ['f-name','f-num','f-phone','f-email','f-amount'].forEach(i => document.getElementById(i).value = '');
+  document.getElementById('f-pos').value = 'MID';
+}
+function handlePhoto(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    pendingPhoto = ev.target.result;
+    document.getElementById('photo-wrap').innerHTML = `<img src="${pendingPhoto}" style="width:80px;height:80px;object-fit:cover;border-radius:50%" alt="">`;
+  };
+  r.readAsDataURL(file);
+}
+function savePlayer() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('Player name is required.'); return; }
+  const obj = {
+    id: editId || nextId++,
+    name,
+    num:    parseInt(document.getElementById('f-num').value) || 0,
+    pos:    document.getElementById('f-pos').value,
+    phone:  document.getElementById('f-phone').value.trim(),
+    email:  document.getElementById('f-email').value.trim(),
+    amount: parseFloat(document.getElementById('f-amount').value) || 0,
+    photo:  pendingPhoto,
+    fees:   editId ? (players.find(x=>x.id===editId)||{}).fees || {} : {}
+  };
+  if (editId) { const i = players.findIndex(x=>x.id===editId); players[i] = obj; }
+  else players.push(obj);
+  closeModal(); renderSquad(); renderFees();
+}
+function delPlayer(id) {
+  if (!confirm('Remove this player from the squad?')) return;
+  players = players.filter(x => x.id !== id);
+  renderSquad(); renderFees();
+}
+function showTab(t, btn) {
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+  document.getElementById(t).classList.add('active');
+  btn.classList.add('active');
+  if (t === 'fees') renderFees();
+}
+
+buildMonthSel();
+renderSquad();
+</script>
+</body>
+</html>
