@@ -3,736 +3,732 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Team Manager</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Football Team Manager</title>
 <style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --green: #00e676;
-    --green-dark: #00a152;
-    --red: #ff1744;
-    --amber: #ffd600;
-    --bg: #0d0f14;
-    --surface: #161a22;
-    --surface2: #1e2430;
-    --border: rgba(255,255,255,0.07);
-    --text: #f0f2f7;
-    --muted: #5a6070;
-    --radius: 12px;
+    --green: #1a7a3c; --green-light: #e8f5ec; --green-mid: #27ae60;
+    --bg: #f4f6f8; --white: #fff; --border: #e0e4ea;
+    --text: #1a1a2e; --muted: #6b7280; --danger: #e24b4a;
+    --warning: #ef9f27; --info: #378add; --success: #1d9e75;
+    --radius: 10px; --shadow: 0 1px 4px rgba(0,0,0,0.08);
   }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 14px;
-  }
+  body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-  /* HEADER */
-  header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    height: 60px;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-  .logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 26px;
-    letter-spacing: 2px;
-    color: var(--green);
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .logo svg { width: 28px; height: 28px; }
-  .nav-tabs {
-    display: flex;
-    gap: 0;
-    margin-left: auto;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .nav-tab {
-    background: none;
-    border: none;
-    color: var(--muted);
-    padding: 7px 18px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all .2s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .nav-tab.active { background: var(--green); color: #000; }
-  .nav-tab:not(.active):hover { background: var(--surface2); color: var(--text); }
+  /* NAV */
+  .navbar { background: var(--green); color: #fff; padding: 0 24px; display: flex; align-items: center; gap: 0; height: 56px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .navbar .brand { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-right: 32px; }
+  .navbar .brand span { font-size: 22px; }
+  .nav-tabs { display: flex; gap: 2px; flex: 1; }
+  .nav-tab { padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.75); border: none; background: transparent; transition: all 0.15s; white-space: nowrap; }
+  .nav-tab:hover { background: rgba(255,255,255,0.12); color: #fff; }
+  .nav-tab.active { background: rgba(255,255,255,0.2); color: #fff; }
 
-  /* MAIN */
-  main { padding: 2rem; max-width: 1100px; margin: 0 auto; }
-  .section { display: none; }
-  .section.active { display: block; }
+  /* LAYOUT */
+  .page { display: none; padding: 24px; max-width: 1100px; margin: 0 auto; }
+  .page.active { display: block; }
 
-  /* SQUAD */
-  .toolbar {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  .toolbar input, .toolbar select {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    padding: 8px 12px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    outline: none;
-    transition: border-color .2s;
-  }
-  .toolbar input { flex: 1; min-width: 160px; }
-  .toolbar input:focus, .toolbar select:focus { border-color: var(--green); }
-  .toolbar select option { background: var(--surface2); }
-  .btn {
-    background: var(--green);
-    color: #000;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 18px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: background .2s, transform .1s;
-    white-space: nowrap;
-  }
-  .btn:hover { background: #00ff88; }
-  .btn:active { transform: scale(.97); }
-  .btn-sm {
-    padding: 5px 12px;
-    font-size: 12px;
-    border-radius: 6px;
-  }
-  .btn-ghost {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-  }
-  .btn-ghost:hover { background: var(--surface2); color: var(--text); border-color: rgba(255,255,255,0.15); }
-  .btn-danger { background: var(--red); color: #fff; }
-  .btn-danger:hover { background: #ff4569; }
+  /* CARDS */
+  .card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; box-shadow: var(--shadow); }
+  .card-title { font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--text); display: flex; align-items: center; gap: 8px; }
 
-  /* PLAYER GRID */
-  .player-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 14px;
-  }
-  .player-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.25rem 1rem 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: border-color .2s, transform .15s;
-    position: relative;
-  }
-  .player-card:hover { border-color: rgba(0,230,118,0.35); transform: translateY(-2px); }
-  .avatar {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    font-weight: 500;
-    overflow: hidden;
-    flex-shrink: 0;
-    border: 2px solid var(--border);
-  }
-  .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-  .p-name { font-size: 14px; font-weight: 500; color: var(--text); text-align: center; }
-  .p-meta { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
-  .pos-badge {
-    font-size: 10px;
-    font-weight: 500;
-    padding: 2px 7px;
-    border-radius: 20px;
-    letter-spacing: .5px;
-  }
-  .pos-GK  { background: #0C447C22; color: #85B7EB; border: 1px solid #0C447C44; }
-  .pos-DEF { background: #27500A22; color: #97C459; border: 1px solid #27500A44; }
-  .pos-MID { background: #63380622; color: #EF9F27; border: 1px solid #63380644; }
-  .pos-FWD { background: #79141422; color: #F09595; border: 1px solid #79141444; }
-  .fee-pill {
-    font-size: 11px;
-    font-weight: 500;
-    padding: 3px 10px;
-    border-radius: 20px;
-    cursor: default;
-  }
-  .fee-pill.all  { background: #00a15222; color: var(--green); border: 1px solid #00a15244; }
-  .fee-pill.part { background: #ffd60022; color: var(--amber); border: 1px solid #ffd60044; }
-  .fee-pill.none { background: #ff174422; color: #ff8a80; border: 1px solid #ff174444; }
-  .p-contact { font-size: 11px; color: var(--muted); }
-  .card-actions { display: flex; gap: 6px; margin-top: 4px; }
-  .icon-btn {
-    width: 28px; height: 28px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--muted);
-    transition: all .15s;
-    font-size: 14px;
-  }
-  .icon-btn:hover { background: var(--surface); color: var(--text); border-color: rgba(255,255,255,0.2); }
-  .icon-btn.danger:hover { color: var(--red); border-color: var(--red); }
-  .empty-state {
-    grid-column: 1/-1;
-    text-align: center;
-    padding: 4rem;
-    color: var(--muted);
-  }
-  .empty-state svg { width: 48px; height: 48px; margin: 0 auto 12px; display: block; opacity: .4; }
+  /* METRIC CARDS */
+  .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .metric-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); padding: 18px 20px; box-shadow: var(--shadow); }
+  .metric-label { font-size: 12px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .metric-value { font-size: 28px; font-weight: 700; line-height: 1; }
+  .metric-value.green { color: var(--green); }
+  .metric-value.red { color: var(--danger); }
+  .metric-value.blue { color: var(--info); }
+  .metric-value.amber { color: var(--warning); }
+  .metric-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .metric-icon { font-size: 20px; margin-bottom: 8px; }
 
-  /* STATS ROW */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-    gap: 10px;
-    margin-bottom: 1.5rem;
-  }
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-  }
-  .stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--text); letter-spacing: 1px; }
-  .stat-val.green { color: var(--green); }
-  .stat-val.red   { color: #ff8a80; }
-  .stat-val.amber { color: var(--amber); }
-  .stat-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  /* BUTTONS */
+  .btn { padding: 8px 16px; border-radius: 7px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-primary { background: var(--green); color: #fff; border-color: var(--green); }
+  .btn-primary:hover { background: #155f2e; }
+  .btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
+  .btn-danger:hover { background: #b83a3a; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-outline { background: transparent; color: var(--green); border-color: var(--green); }
+  .btn-outline:hover { background: var(--green-light); }
 
-  /* FEE TABLE */
-  .fee-wrap {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-    margin-bottom: 1.5rem;
-  }
-  .fee-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-  .fee-table th {
-    text-align: left;
-    padding: 10px 14px;
-    color: var(--muted);
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: .8px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface2);
-  }
-  .fee-table td {
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--border);
-    color: var(--text);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    vertical-align: middle;
-  }
-  .fee-table tr:last-child td { border-bottom: none; }
-  .fee-table tr:hover td { background: var(--surface2); }
-  .toggle-fee-btn {
-    background: none;
-    border: 1px solid;
-    border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    transition: all .15s;
-  }
-  .toggle-fee-btn.paid   { border-color: #00a15244; color: var(--green); background: #00a15215; }
-  .toggle-fee-btn.unpaid { border-color: #ff174444; color: #ff8a80; background: #ff174415; }
-  .toggle-fee-btn:hover  { opacity: .75; }
+  /* TABLES */
+  .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { background: #f8f9fb; padding: 10px 14px; text-align: left; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 14px; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fafbfc; }
 
-  /* YEAR VIEW */
-  .year-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; }
-  .year-section h3 { font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: .8px; }
-  .year-row {
-    display: grid;
-    grid-template-columns: 130px 1fr;
-    gap: 8px;
-    align-items: center;
-    margin-bottom: 6px;
-  }
-  .year-player { display: flex; align-items: center; gap: 6px; overflow: hidden; }
-  .year-player span { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
-  .months-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; }
-  .mbox {
-    height: 22px;
-    border-radius: 4px;
-    border: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 9px;
-    cursor: pointer;
-    color: var(--muted);
-    background: var(--surface2);
-    transition: all .15s;
-    font-weight: 500;
-    letter-spacing: .3px;
-  }
-  .mbox:hover { border-color: rgba(255,255,255,0.2); }
-  .mbox.paid   { background: #00a15222; color: var(--green); border-color: #00a15244; }
-  .mbox.unpaid { background: #ff174422; color: #ff8a80; border-color: #ff174444; }
-  .mbox.future { opacity: .25; cursor: default; pointer-events: none; }
+  /* BADGES */
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge-paid { background: #d1fae5; color: #065f46; }
+  .badge-unpaid { background: #fee2e2; color: #991b1b; }
+  .badge-partial { background: #fef3c7; color: #92400e; }
+
+  /* MONTH PAYMENT GRID */
+  .month-cell { width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; cursor: pointer; border: 1.5px solid transparent; transition: all 0.12s; position: relative; }
+  .month-cell.paid { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+  .month-cell.unpaid { background: #f3f4f6; color: #6b7280; border-color: #e5e7eb; }
+  .month-cell.paid:hover { background: #a7f3d0; }
+  .month-cell.unpaid:hover { background: #e5e7eb; }
+  .months-row { display: flex; gap: 4px; flex-wrap: wrap; }
 
   /* MODAL */
-  .modal-backdrop {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.65);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-  }
-  .modal-backdrop.open { display: flex; }
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 1.75rem;
-    width: 400px;
-    max-width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-  .modal h2 { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1.5px; color: var(--green); margin-bottom: 1.25rem; }
-  .photo-upload {
-    width: 80px; height: 80px;
-    border-radius: 50%;
-    border: 2px dashed var(--border);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    cursor: pointer;
-    overflow: hidden;
-    margin: 0 auto 1.25rem;
-    color: var(--muted);
-    font-size: 11px;
-    gap: 4px;
-    transition: border-color .2s;
-  }
-  .photo-upload:hover { border-color: var(--green); }
-  .photo-upload img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .field { margin-bottom: 12px; }
-  .field label { font-size: 11px; color: var(--muted); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: .6px; }
-  .field input, .field select {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    padding: 9px 12px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    outline: none;
-    transition: border-color .2s;
-  }
-  .field input:focus, .field select:focus { border-color: var(--green); }
-  .field select option { background: var(--surface2); }
-  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 999; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--white); border-radius: 14px; padding: 28px; width: 100%; max-width: 480px; box-shadow: 0 8px 40px rgba(0,0,0,0.18); max-height: 90vh; overflow-y: auto; }
+  .modal h2 { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
 
-  /* MONTH FILTER */
-  .month-filter { display: flex; gap: 8px; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; }
-  .month-filter select {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    padding: 8px 12px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    outline: none;
-  }
-  .month-filter select:focus { border-color: var(--green); }
-  .hint { font-size: 12px; color: var(--muted); }
+  /* FORM */
+  .form-group { margin-bottom: 14px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; color: var(--muted); }
+  .form-group input, .form-group select { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 7px; font-size: 14px; background: #fff; color: var(--text); }
+  .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(26,122,60,0.1); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-  /* SCROLLBAR */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
+  /* MISC */
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: gap; gap: 12px; }
+  .page-header h1 { font-size: 22px; font-weight: 700; }
+  .section-gap { margin-bottom: 20px; }
+  .text-muted { color: var(--muted); font-size: 13px; }
+  .progress-bar { height: 8px; background: #f0f2f5; border-radius: 4px; overflow: hidden; margin-top: 6px; }
+  .progress-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
+  .expense-cat-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .cat-field { background: #e0f2fe; color: #075985; }
+  .cat-jerseys { background: #f3e8ff; color: #6b21a8; }
+  .cat-balls { background: #dcfce7; color: #166534; }
+  .cat-transport { background: #fef9c3; color: #713f12; }
+  .cat-other { background: #f1f5f9; color: #334155; }
+  .empty-state { text-align: center; padding: 40px; color: var(--muted); }
+  .empty-state .icon { font-size: 40px; margin-bottom: 10px; }
+  .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+  @media (max-width: 640px) { .dashboard-grid { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } }
+  .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+  .bar-item { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .bar-label { width: 80px; text-align: right; color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track { flex: 1; height: 10px; background: #f0f2f5; border-radius: 5px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 5px; }
+  .bar-val { min-width: 50px; font-size: 12px; font-weight: 600; }
+  .search-input { padding: 8px 12px; border: 1px solid var(--border); border-radius: 7px; font-size: 14px; min-width: 200px; }
+  .search-input:focus { outline: none; border-color: var(--green); }
+  .filter-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+  .inline-actions { display: flex; gap: 6px; }
+  .topbar-right { display: flex; gap: 10px; align-items: center; }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">
-    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="16" cy="16" r="14" stroke="#00e676" stroke-width="2"/>
-      <path d="M16 4 L19 12 L27 12 L21 17 L23 25 L16 20 L9 25 L11 17 L5 12 L13 12 Z" fill="#00e676" opacity=".85"/>
-    </svg>
-    SQUAD
+<nav class="navbar">
+  <div class="brand"><span>⚽</span> Team Manager</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('dashboard')">📊 Dashboard</button>
+    <button class="nav-tab" onclick="showPage('players')">👥 Players</button>
+    <button class="nav-tab" onclick="showPage('payments')">💳 Payments</button>
+    <button class="nav-tab" onclick="showPage('expenses')">💸 Expenses</button>
   </div>
-  <nav class="nav-tabs">
-    <button class="nav-tab active" onclick="showTab('squad',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/></svg>
-      Squad
-    </button>
-    <button class="nav-tab" onclick="showTab('fees',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-      Fees
-    </button>
-  </nav>
-</header>
+</nav>
 
-<main>
-
-  <!-- SQUAD SECTION -->
-  <div id="squad" class="section active">
-    <div class="toolbar">
-      <input type="text" id="search" placeholder="Search name or number…" oninput="renderSquad()">
-      <select id="posF" onchange="renderSquad()">
-        <option value="">All positions</option>
-        <option>GK</option><option>DEF</option><option>MID</option><option>FWD</option>
-      </select>
-      <select id="feeF" onchange="renderSquad()">
-        <option value="">All status</option>
-        <option value="all">All paid</option>
-        <option value="part">Partial</option>
-        <option value="none">None paid</option>
-      </select>
-      <button class="btn" onclick="openAdd()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add Player
-      </button>
-    </div>
-    <div class="player-grid" id="player-grid"></div>
+<!-- ═══════════════════════════════════════ DASHBOARD ═══════════════════════ -->
+<div id="page-dashboard" class="page active">
+  <div class="page-header">
+    <h1>📊 Dashboard</h1>
+    <span class="text-muted" id="dash-date"></span>
   </div>
 
-  <!-- FEES SECTION -->
-  <div id="fees" class="section">
-    <div class="stats-row" id="stats"></div>
-    <div class="month-filter">
-      <select id="monthSel" onchange="renderFees()"></select>
-      <span class="hint">Click paid/unpaid to toggle</span>
+  <div class="metrics-grid" id="dash-metrics"></div>
+
+  <div class="dashboard-grid">
+    <div class="card">
+      <div class="card-title">💰 Financial overview</div>
+      <div id="dash-finance"></div>
     </div>
-    <div class="fee-wrap">
-      <table class="fee-table">
-        <thead>
-          <tr>
-            <th style="width:42px">#</th>
-            <th style="width:44px"></th>
-            <th>Player</th>
-            <th style="width:60px">Pos</th>
-            <th style="width:90px">Amount</th>
-            <th style="width:100px">Status</th>
-          </tr>
-        </thead>
-        <tbody id="fee-body"></tbody>
-      </table>
+    <div class="card">
+      <div class="card-title">📅 Payment rate by month</div>
+      <div id="dash-monthly-chart" class="bar-chart"></div>
     </div>
-    <div class="year-section">
-      <h3>Full year — 2026</h3>
-      <div id="year-view"></div>
+    <div class="card">
+      <div class="card-title">💸 Expenses by category</div>
+      <div id="dash-expenses-chart" class="bar-chart"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">🏃 Unpaid players (current month)</div>
+      <div id="dash-unpaid-list"></div>
     </div>
   </div>
+</div>
 
-</main>
+<!-- ═══════════════════════════════════════ PLAYERS ════════════════════════ -->
+<div id="page-players" class="page">
+  <div class="page-header">
+    <h1>👥 Players</h1>
+    <button class="btn btn-primary" onclick="openModal('player')">+ Add player</button>
+  </div>
+  <div class="filter-row">
+    <input class="search-input" id="player-search" placeholder="Search players..." oninput="renderPlayers()">
+    <select onchange="renderPlayers()" id="player-filter" style="padding:8px 12px; border:1px solid var(--border); border-radius:7px; font-size:14px;">
+      <option value="all">All positions</option>
+      <option value="Goalkeeper">Goalkeeper</option>
+      <option value="Defender">Defender</option>
+      <option value="Midfielder">Midfielder</option>
+      <option value="Forward">Forward</option>
+    </select>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th><th>Name</th><th>Position</th><th>Phone</th><th>Monthly fee</th><th>Joined</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="players-tbody"></tbody>
+    </table>
+  </div>
+  <div id="players-empty" class="empty-state" style="display:none">
+    <div class="icon">👤</div>
+    <p>No players yet. Add your first player!</p>
+  </div>
+</div>
 
-<!-- MODAL -->
-<div class="modal-backdrop" id="modal-backdrop" onclick="if(event.target===this)closeModal()">
+<!-- ═══════════════════════════════════════ PAYMENTS ══════════════════════ -->
+<div id="page-payments" class="page">
+  <div class="page-header">
+    <h1>💳 Monthly payments</h1>
+    <div class="topbar-right">
+      <select id="pay-year" onchange="renderPayments()" style="padding:8px 12px; border:1px solid var(--border); border-radius:7px; font-size:14px;"></select>
+      <input class="search-input" id="pay-search" placeholder="Search..." oninput="renderPayments()" style="min-width:150px">
+    </div>
+  </div>
+  <div class="card section-gap" style="padding:12px 16px; background: var(--green-light); border-color: #86efac;">
+    <span style="font-size:13px; color: #065f46;">💡 Click any month circle to toggle paid/unpaid for that player</span>
+  </div>
+  <div class="table-wrap">
+    <table id="payments-table">
+      <thead id="payments-thead"></thead>
+      <tbody id="payments-tbody"></tbody>
+    </table>
+  </div>
+  <div id="payments-empty" class="empty-state" style="display:none">
+    <div class="icon">💳</div>
+    <p>No players found.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════ EXPENSES ══════════════════════ -->
+<div id="page-expenses" class="page">
+  <div class="page-header">
+    <h1>💸 Expenses</h1>
+    <button class="btn btn-primary" onclick="openModal('expense')">+ Add expense</button>
+  </div>
+
+  <div class="metrics-grid" id="exp-metrics" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));"></div>
+
+  <div class="filter-row">
+    <select onchange="renderExpenses()" id="exp-cat-filter" style="padding:8px 12px; border:1px solid var(--border); border-radius:7px; font-size:14px;">
+      <option value="all">All categories</option>
+      <option value="Field rent">Field rent</option>
+      <option value="Jerseys">Jerseys</option>
+      <option value="Balls">Balls</option>
+      <option value="Transportation">Transportation</option>
+      <option value="Other">Other</option>
+    </select>
+    <select onchange="renderExpenses()" id="exp-month-filter" style="padding:8px 12px; border:1px solid var(--border); border-radius:7px; font-size:14px;"></select>
+    <input class="search-input" id="exp-search" placeholder="Search expenses..." oninput="renderExpenses()" style="min-width:180px">
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th>Actions</th></tr>
+      </thead>
+      <tbody id="expenses-tbody"></tbody>
+    </table>
+  </div>
+  <div id="expenses-empty" class="empty-state" style="display:none">
+    <div class="icon">💸</div>
+    <p>No expenses recorded yet.</p>
+  </div>
+</div>
+
+<!-- ═══════════════ MODALS ═════════════════════════════════════════════════ -->
+
+<!-- Player modal -->
+<div class="modal-overlay" id="modal-player">
   <div class="modal">
-    <h2 id="modal-title">Add Player</h2>
-    <div class="photo-upload" id="photo-wrap" onclick="document.getElementById('photo-input').click()">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-      <span>Add photo</span>
-    </div>
-    <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhoto(event)">
+    <h2 id="player-modal-title">Add player</h2>
     <div class="form-row">
-      <div class="field" style="grid-column:1/-1">
-        <label>Full name *</label>
-        <input id="f-name" type="text" placeholder="e.g. Ahmed Al-Rashid">
-      </div>
-      <div class="field">
-        <label>Jersey #</label>
-        <input id="f-num" type="number" min="1" max="99" placeholder="e.g. 10">
-      </div>
-      <div class="field">
+      <div class="form-group"><label>First name</label><input id="p-fname" placeholder="Ahmed"></div>
+      <div class="form-group"><label>Last name</label><input id="p-lname" placeholder="Hassan"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
         <label>Position</label>
-        <select id="f-pos">
-          <option>GK</option><option>DEF</option><option selected>MID</option><option>FWD</option>
+        <select id="p-position">
+          <option>Goalkeeper</option><option>Defender</option><option>Midfielder</option><option>Forward</option>
         </select>
       </div>
-      <div class="field">
-        <label>Phone</label>
-        <input id="f-phone" type="tel" placeholder="+81 90-0000-0000">
-      </div>
-      <div class="field">
-        <label>Email</label>
-        <input id="f-email" type="email" placeholder="player@email.com">
-      </div>
-      <div class="field" style="grid-column:1/-1">
-        <label>Monthly fee (¥)</label>
-        <input id="f-amount" type="number" min="0" placeholder="e.g. 3000">
-      </div>
+      <div class="form-group"><label>Jersey number</label><input id="p-number" type="number" placeholder="10"></div>
     </div>
-    <div class="modal-actions">
-      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-sm" onclick="savePlayer()">Save Player</button>
+    <div class="form-row">
+      <div class="form-group"><label>Phone</label><input id="p-phone" placeholder="+20..."></div>
+      <div class="form-group"><label>Monthly fee (EGP)</label><input id="p-fee" type="number" placeholder="300"></div>
+    </div>
+    <div class="form-group"><label>Join date</label><input id="p-joined" type="date"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('player')">Cancel</button>
+      <button class="btn btn-primary" onclick="savePlayer()">Save player</button>
+    </div>
+  </div>
+</div>
+
+<!-- Expense modal -->
+<div class="modal-overlay" id="modal-expense">
+  <div class="modal">
+    <h2 id="expense-modal-title">Add expense</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Category</label>
+        <select id="e-cat">
+          <option>Field rent</option><option>Jerseys</option><option>Balls</option><option>Transportation</option><option>Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Amount (EGP)</label><input id="e-amount" type="number" placeholder="500"></div>
+    </div>
+    <div class="form-group"><label>Description</label><input id="e-desc" placeholder="Monthly field rent - Cairo stadium"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Date</label><input id="e-date" type="date"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('expense')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveExpense()">Save expense</button>
     </div>
   </div>
 </div>
 
 <script>
+// ═══════════════════════════ STATE ═══════════════════════════════════════════
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const YEAR = 2026;
-const NOW_MONTH = 5;
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const CATEGORIES = ['Field rent','Jerseys','Balls','Transportation','Other'];
+const CAT_CLASSES = {'Field rent':'cat-field','Jerseys':'cat-jerseys','Balls':'cat-balls','Transportation':'cat-transport','Other':'cat-other'};
+const CAT_COLORS = {'Field rent':'#0ea5e9','Jerseys':'#a855f7','Balls':'#22c55e','Transportation':'#f59e0b','Other':'#94a3b8'};
 
-const AV_BG  = ['#0C447C','#27500A','#633806','#791F1F','#3C3489','#085041','#72243E','#854F0B','#444441'];
-const AV_TXT = ['#85B7EB','#97C459','#EF9F27','#F09595','#AFA9EC','#5DCAA5','#ED93B1','#FAC775','#B4B2A9'];
+let players = JSON.parse(localStorage.getItem('ftm_players') || '[]');
+let payments = JSON.parse(localStorage.getItem('ftm_payments') || '{}');
+let expenses = JSON.parse(localStorage.getItem('ftm_expenses') || '[]');
+let editingPlayer = null;
+let editingExpense = null;
 
-let players = [
-  {id:1, name:'Waleed ibrahim',   num:1,  pos:'GK',  phone:'090-1234-0001', email:'yusuf@mail.com',  amount:3000, photo:'', fees:{'2026-01':true,'2026-02':true,'2026-03':true,'2026-04':true,'2026-05':true}},
-  {id:2, name:'Omar Hassan',    num:4,  pos:'DEF', phone:'090-1234-0002', email:'omar@mail.com',   amount:3000, photo:'', fees:{'2026-01':true,'2026-02':true,'2026-03':true,'2026-04':true}},
-  {id:3, name:'waleed ali', num:5,  pos:'DEF', phone:'090-1234-0003', email:'kenji@mail.com',  amount:3000, photo:'', fees:{'2026-01':true,'2026-02':true,'2026-03':true}},
-  {id:4, name:'Lucas Ferreira', num:8,  pos:'MID', phone:'090-1234-0004', email:'lucas@mail.com',  amount:3000, photo:'', fees:{'2026-01':true,'2026-02':true,'2026-03':true,'2026-04':true,'2026-05':true}},
-  {id:5, name:'Arjun Mehta',    num:10, pos:'FWD', phone:'090-1234-0005', email:'arjun@mail.com',  amount:3000, photo:'', fees:{}},
-];
-let nextId = 20, editId = null, pendingPhoto = '';
-
-function mk(m) { return `${YEAR}-${String(m).padStart(2,'0')}`; }
-function initials(n) { return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase(); }
-function ci(id) { return id % AV_BG.length; }
-
-function feeStatus(p) {
-  const paid = Object.keys(p.fees||{}).filter(k=>p.fees[k]).length;
-  if (paid === 0) return 'none';
-  if (paid >= NOW_MONTH) return 'all';
-  return 'part';
-}
-function feeLabel(p) {
-  const paid = Object.keys(p.fees||{}).filter(k=>p.fees[k]).length;
-  const s = feeStatus(p);
-  if (s==='all')  return {cls:'all',  txt:'All paid'};
-  if (s==='none') return {cls:'none', txt:'Unpaid'};
-  return {cls:'part', txt:`${paid}/${NOW_MONTH} months`};
+function save() {
+  localStorage.setItem('ftm_players', JSON.stringify(players));
+  localStorage.setItem('ftm_payments', JSON.stringify(payments));
+  localStorage.setItem('ftm_expenses', JSON.stringify(expenses));
 }
 
-function avatarEl(p, size=64) {
-  const i = ci(p.id);
-  if (p.photo) return `<div class="avatar" style="width:${size}px;height:${size}px"><img src="${p.photo}" alt=""></div>`;
-  return `<div class="avatar" style="width:${size}px;height:${size}px;background:${AV_BG[i]}22;border-color:${AV_BG[i]}44;color:${AV_TXT[i]};font-size:${size>40?Math.round(size/3.2):10}px">${initials(p.name)}</div>`;
+// payments[playerId][year][monthIndex] = true/false
+
+function getPayment(pid, year, month) {
+  return payments[pid]?.[year]?.[month] === true;
 }
 
-function renderSquad() {
-  const q   = document.getElementById('search').value.toLowerCase();
-  const pf  = document.getElementById('posF').value;
-  const ff  = document.getElementById('feeF').value;
-  const list = players.filter(p =>
-    (!q  || p.name.toLowerCase().includes(q) || String(p.num).includes(q)) &&
-    (!pf || p.pos === pf) &&
-    (!ff || feeStatus(p) === ff)
-  );
-  const g = document.getElementById('player-grid');
-  if (!list.length) {
-    g.innerHTML = `<div class="empty-state">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><line x1="18" y1="10" x2="22" y2="10"/></svg>
-      <div>No players found</div>
+function togglePayment(pid, year, month) {
+  if (!payments[pid]) payments[pid] = {};
+  if (!payments[pid][year]) payments[pid][year] = {};
+  payments[pid][year][month] = !payments[pid][year][month];
+  save();
+  renderPayments();
+  renderDashboard();
+}
+
+// ═══════════════════════════ NAVIGATION ══════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  event.target.classList.add('active');
+  if (name === 'dashboard') renderDashboard();
+  if (name === 'players') renderPlayers();
+  if (name === 'payments') renderPayments();
+  if (name === 'expenses') { renderExpenses(); renderExpenseMetrics(); }
+}
+
+// ═══════════════════════════ DASHBOARD ══════════════════════════════════════
+function renderDashboard() {
+  const now = new Date();
+  document.getElementById('dash-date').textContent = now.toLocaleDateString('en-GB', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+
+  const year = now.getFullYear();
+  const month = now.getMonth();
+
+  const total = players.length;
+  const paidThisMonth = players.filter(p => getPayment(p.id, year, month)).length;
+  const unpaidThisMonth = total - paidThisMonth;
+
+  // total collected all time
+  let totalCollected = 0;
+  players.forEach(p => {
+    Object.keys(payments[p.id] || {}).forEach(y => {
+      Object.keys(payments[p.id][y] || {}).forEach(m => {
+        if (payments[p.id][y][m]) totalCollected += (p.fee || 0);
+      });
+    });
+  });
+
+  const totalExpenses = expenses.reduce((s,e) => s + (e.amount||0), 0);
+  const balance = totalCollected - totalExpenses;
+
+  document.getElementById('dash-metrics').innerHTML = `
+    <div class="metric-card"><div class="metric-label">Total players</div><div class="metric-value blue">${total}</div><div class="metric-sub">Registered</div></div>
+    <div class="metric-card"><div class="metric-label">Paid this month</div><div class="metric-value green">${paidThisMonth}</div><div class="metric-sub">${MONTH_NAMES[month]}</div></div>
+    <div class="metric-card"><div class="metric-label">Unpaid this month</div><div class="metric-value red">${unpaidThisMonth}</div><div class="metric-sub">Need follow-up</div></div>
+    <div class="metric-card"><div class="metric-label">Total collected</div><div class="metric-value green">${totalCollected.toLocaleString()} EGP</div><div class="metric-sub">All time</div></div>
+    <div class="metric-card"><div class="metric-label">Total expenses</div><div class="metric-value red">${totalExpenses.toLocaleString()} EGP</div><div class="metric-sub">All time</div></div>
+    <div class="metric-card"><div class="metric-label">Net balance</div><div class="metric-value ${balance>=0?'green':'red'}">${balance.toLocaleString()} EGP</div><div class="metric-sub">${balance>=0?'Surplus':'Deficit'}</div></div>
+  `;
+
+  // Finance overview
+  const pct = total > 0 ? Math.round(paidThisMonth / total * 100) : 0;
+  document.getElementById('dash-finance').innerHTML = `
+    <div style="margin-bottom:14px">
+      <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px">
+        <span>Payment rate (${MONTH_NAMES[month]})</span><span style="font-weight:600">${pct}%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%; background: var(--green-mid);"></div></div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:10px; font-size:13px">
+      <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border)">
+        <span style="color:var(--muted)">Expected this month</span>
+        <span style="font-weight:600">${players.reduce((s,p)=>s+(p.fee||0),0).toLocaleString()} EGP</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border)">
+        <span style="color:var(--muted)">Collected this month</span>
+        <span style="font-weight:600; color:var(--green)">${players.filter(p=>getPayment(p.id,year,month)).reduce((s,p)=>s+(p.fee||0),0).toLocaleString()} EGP</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; padding:10px 0">
+        <span style="color:var(--muted)">Pending this month</span>
+        <span style="font-weight:600; color:var(--danger)">${players.filter(p=>!getPayment(p.id,year,month)).reduce((s,p)=>s+(p.fee||0),0).toLocaleString()} EGP</span>
+      </div>
     </div>`;
+
+  // Monthly chart (last 6 months)
+  const monthlyChart = document.getElementById('dash-monthly-chart');
+  let monthRows = '';
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(year, month - i, 1);
+    const y2 = d.getFullYear(), m2 = d.getMonth();
+    const paid = players.filter(p => getPayment(p.id, y2, m2)).length;
+    const pct2 = total > 0 ? Math.round(paid/total*100) : 0;
+    monthRows += `<div class="bar-item">
+      <span class="bar-label">${MONTHS[m2]}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct2}%; background:var(--green-mid)"></div></div>
+      <span class="bar-val" style="color:var(--green)">${paid}/${total}</span>
+    </div>`;
+  }
+  monthlyChart.innerHTML = monthRows || '<p class="text-muted">No data</p>';
+
+  // Expenses chart
+  const expChart = document.getElementById('dash-expenses-chart');
+  const catTotals = {};
+  CATEGORIES.forEach(c => catTotals[c] = 0);
+  expenses.forEach(e => { catTotals[e.category] = (catTotals[e.category]||0) + e.amount; });
+  const maxExp = Math.max(...Object.values(catTotals), 1);
+  expChart.innerHTML = CATEGORIES.map(c => `
+    <div class="bar-item">
+      <span class="bar-label">${c}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(catTotals[c]/maxExp*100)}%; background:${CAT_COLORS[c]}"></div></div>
+      <span class="bar-val">${catTotals[c].toLocaleString()}</span>
+    </div>`).join('');
+
+  // Unpaid players list
+  const unpaid = players.filter(p => !getPayment(p.id, year, month));
+  const unpaidEl = document.getElementById('dash-unpaid-list');
+  if (unpaid.length === 0) {
+    unpaidEl.innerHTML = '<div style="text-align:center; padding:20px; color:var(--success); font-weight:600">🎉 All players paid this month!</div>';
+  } else {
+    unpaidEl.innerHTML = `<div style="display:flex; flex-direction:column; gap:8px">${
+      unpaid.map(p => `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:#fff8f8; border-radius:7px; border:1px solid #fee2e2">
+        <span style="font-size:14px; font-weight:500">${p.fname} ${p.lname}</span>
+        <span style="font-size:13px; color:var(--danger); font-weight:600">${(p.fee||0).toLocaleString()} EGP</span>
+      </div>`).join('')
+    }</div>`;
+  }
+}
+
+// ═══════════════════════════ PLAYERS ════════════════════════════════════════
+function renderPlayers() {
+  const q = (document.getElementById('player-search')?.value || '').toLowerCase();
+  const pos = document.getElementById('player-filter')?.value || 'all';
+  const filtered = players.filter(p => {
+    const name = `${p.fname} ${p.lname}`.toLowerCase();
+    return (pos === 'all' || p.position === pos) && (!q || name.includes(q) || p.phone?.includes(q));
+  });
+
+  const tbody = document.getElementById('players-tbody');
+  const empty = document.getElementById('players-empty');
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
     return;
   }
-  g.innerHTML = list.map(p => {
-    const fl = feeLabel(p);
-    return `<div class="player-card" onclick="openEdit(${p.id})">
-      ${avatarEl(p, 64)}
-      <div class="p-name">${p.name}</div>
-      <div class="p-meta">#${p.num} &nbsp;<span class="pos-badge pos-${p.pos}">${p.pos}</span></div>
-      <span class="fee-pill ${fl.cls}">${fl.txt}</span>
-      ${p.phone ? `<div class="p-contact">${p.phone}</div>` : ''}
-      <div class="card-actions" onclick="event.stopPropagation()">
-        <button class="icon-btn" onclick="openEdit(${p.id})" title="Edit">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>
-        </button>
-        <button class="icon-btn danger" onclick="delPlayer(${p.id})" title="Delete">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-        </button>
-      </div>
-    </div>`;
-  }).join('');
+  empty.style.display = 'none';
+  tbody.innerHTML = filtered.map((p, i) => `
+    <tr>
+      <td style="font-weight:700; color:var(--green)">${p.number || '—'}</td>
+      <td><span style="font-weight:500">${p.fname} ${p.lname}</span></td>
+      <td>${p.position}</td>
+      <td style="color:var(--muted)">${p.phone || '—'}</td>
+      <td style="font-weight:600; color:var(--green)">${(p.fee||0).toLocaleString()} EGP</td>
+      <td style="color:var(--muted); font-size:13px">${p.joined || '—'}</td>
+      <td>
+        <div class="inline-actions">
+          <button class="btn btn-sm btn-outline" onclick="editPlayer('${p.id}')">✏️ Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deletePlayer('${p.id}')">🗑</button>
+        </div>
+      </td>
+    </tr>`).join('');
 }
 
-function buildMonthSel() {
-  const sel = document.getElementById('monthSel');
+function openModal(type) {
+  if (type === 'player') {
+    editingPlayer = null;
+    document.getElementById('player-modal-title').textContent = 'Add player';
+    ['p-fname','p-lname','p-phone','p-number','p-fee'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('p-position').value = 'Goalkeeper';
+    document.getElementById('p-joined').value = new Date().toISOString().split('T')[0];
+  } else {
+    editingExpense = null;
+    document.getElementById('expense-modal-title').textContent = 'Add expense';
+    ['e-desc','e-amount'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('e-cat').value = 'Field rent';
+    document.getElementById('e-date').value = new Date().toISOString().split('T')[0];
+  }
+  document.getElementById('modal-'+type).classList.add('open');
+}
+
+function closeModal(type) {
+  document.getElementById('modal-'+type).classList.remove('open');
+}
+
+function editPlayer(id) {
+  const p = players.find(x => x.id === id);
+  if (!p) return;
+  editingPlayer = id;
+  document.getElementById('player-modal-title').textContent = 'Edit player';
+  document.getElementById('p-fname').value = p.fname || '';
+  document.getElementById('p-lname').value = p.lname || '';
+  document.getElementById('p-position').value = p.position || 'Goalkeeper';
+  document.getElementById('p-number').value = p.number || '';
+  document.getElementById('p-phone').value = p.phone || '';
+  document.getElementById('p-fee').value = p.fee || '';
+  document.getElementById('p-joined').value = p.joined || '';
+  document.getElementById('modal-player').classList.add('open');
+}
+
+function savePlayer() {
+  const fname = document.getElementById('p-fname').value.trim();
+  const lname = document.getElementById('p-lname').value.trim();
+  if (!fname) { alert('First name is required'); return; }
+  const data = {
+    id: editingPlayer || Date.now().toString(),
+    fname, lname,
+    position: document.getElementById('p-position').value,
+    number: document.getElementById('p-number').value,
+    phone: document.getElementById('p-phone').value.trim(),
+    fee: parseFloat(document.getElementById('p-fee').value) || 0,
+    joined: document.getElementById('p-joined').value,
+  };
+  if (editingPlayer) {
+    const idx = players.findIndex(p => p.id === editingPlayer);
+    if (idx !== -1) players[idx] = data;
+  } else {
+    players.push(data);
+  }
+  save();
+  closeModal('player');
+  renderPlayers();
+  renderDashboard();
+}
+
+function deletePlayer(id) {
+  if (!confirm('Delete this player? All their payment records will also be removed.')) return;
+  players = players.filter(p => p.id !== id);
+  delete payments[id];
+  save();
+  renderPlayers();
+  renderDashboard();
+}
+
+// ═══════════════════════════ PAYMENTS ════════════════════════════════════════
+function initPayYears() {
+  const sel = document.getElementById('pay-year');
+  const now = new Date();
   sel.innerHTML = '';
-  for (let m = 1; m <= NOW_MONTH; m++) {
-    const o = document.createElement('option');
-    o.value = mk(m);
-    o.textContent = `${MONTHS[m-1]} ${YEAR}`;
-    if (m === NOW_MONTH) o.selected = true;
-    sel.appendChild(o);
+  for (let y = now.getFullYear() + 1; y >= 2022; y--) {
+    const opt = document.createElement('option');
+    opt.value = y; opt.textContent = y;
+    if (y === now.getFullYear()) opt.selected = true;
+    sel.appendChild(opt);
   }
 }
 
-function renderFees() {
-  const key = document.getElementById('monthSel').value;
-  const paid = players.filter(p => p.fees && p.fees[key]);
-  const unpaid = players.filter(p => !p.fees || !p.fees[key]);
-  const collected = paid.reduce((a,p) => a + (Number(p.amount)||0), 0);
-  const pending   = unpaid.reduce((a,p) => a + (Number(p.amount)||0), 0);
+function renderPayments() {
+  const year = parseInt(document.getElementById('pay-year')?.value || new Date().getFullYear());
+  const q = (document.getElementById('pay-search')?.value || '').toLowerCase();
+  const filtered = players.filter(p => !q || `${p.fname} ${p.lname}`.toLowerCase().includes(q));
 
-  document.getElementById('stats').innerHTML = `
-    <div class="stat-card"><div class="stat-val">${players.length}</div><div class="stat-lbl">Players</div></div>
-    <div class="stat-card"><div class="stat-val green">${paid.length}</div><div class="stat-lbl">Paid</div></div>
-    <div class="stat-card"><div class="stat-val red">${unpaid.length}</div><div class="stat-lbl">Unpaid</div></div>
-    <div class="stat-card"><div class="stat-val green">¥${collected.toLocaleString()}</div><div class="stat-lbl">Collected</div></div>
-    <div class="stat-card"><div class="stat-val amber">¥${pending.toLocaleString()}</div><div class="stat-lbl">Pending</div></div>`;
+  const thead = document.getElementById('payments-thead');
+  const tbody = document.getElementById('payments-tbody');
+  const empty = document.getElementById('payments-empty');
 
-  const sorted = [...players].sort((a,b) => a.name.localeCompare(b.name));
-  document.getElementById('fee-body').innerHTML = sorted.map(p => {
-    const isPaid = !!(p.fees && p.fees[key]);
+  if (players.length === 0) {
+    thead.innerHTML = ''; tbody.innerHTML = '';
+    empty.style.display = 'block'; return;
+  }
+  empty.style.display = 'none';
+
+  thead.innerHTML = `<tr>
+    <th>Player</th><th>Fee</th>${MONTHS.map((m,i)=>`<th style="text-align:center">${m}</th>`).join('')}<th style="text-align:center">Total</th>
+  </tr>`;
+
+  tbody.innerHTML = filtered.map(p => {
+    const paidMonths = MONTHS.filter((m,i) => getPayment(p.id, year, i)).length;
+    const cells = MONTHS.map((m,i) => {
+      const paid = getPayment(p.id, year, i);
+      return `<td style="text-align:center">
+        <span class="month-cell ${paid?'paid':'unpaid'}" onclick="togglePayment('${p.id}',${year},${i})" title="${paid?'Paid - click to mark unpaid':'Unpaid - click to mark paid'}">
+          ${paid ? '✓' : m.charAt(0)}
+        </span>
+      </td>`;
+    }).join('');
+    const totalPaid = paidMonths * (p.fee || 0);
     return `<tr>
-      <td>#${p.num}</td>
-      <td>${avatarEl(p, 28)}</td>
-      <td style="font-weight:500">${p.name}</td>
-      <td><span class="pos-badge pos-${p.pos}">${p.pos}</span></td>
-      <td>¥${Number(p.amount||0).toLocaleString()}</td>
-      <td><button class="toggle-fee-btn ${isPaid?'paid':'unpaid'}" onclick="toggleMonth(${p.id},'${key}')">${isPaid ? '✓ Paid' : '✗ Unpaid'}</button></td>
+      <td><span style="font-weight:500">${p.fname} ${p.lname}</span></td>
+      <td style="color:var(--muted);font-size:13px">${(p.fee||0).toLocaleString()}</td>
+      ${cells}
+      <td style="text-align:center; font-weight:600; color:var(--green)">${totalPaid.toLocaleString()}</td>
     </tr>`;
   }).join('');
-
-  renderYearView();
 }
 
-function toggleMonth(id, key) {
-  const p = players.find(x => x.id === id);
-  if (!p) return;
-  if (!p.fees) p.fees = {};
-  p.fees[key] = !p.fees[key];
-  renderFees(); renderSquad();
+// ═══════════════════════════ EXPENSES ════════════════════════════════════════
+function initExpMonthFilter() {
+  const sel = document.getElementById('exp-month-filter');
+  if (!sel) return;
+  sel.innerHTML = '<option value="all">All months</option>';
+  const now = new Date();
+  for (let i = 0; i < 12; i++) {
+    const opt = document.createElement('option');
+    opt.value = i; opt.textContent = MONTH_NAMES[i] + ' ' + now.getFullYear();
+    sel.appendChild(opt);
+  }
 }
 
-function renderYearView() {
-  const sorted = [...players].sort((a,b) => a.name.localeCompare(b.name));
-  document.getElementById('year-view').innerHTML = sorted.map(p => {
-    const months = MONTHS.map((mn, i) => {
-      const key = mk(i+1);
-      const future = i+1 > NOW_MONTH;
-      const isPaid = !!(p.fees && p.fees[key]);
-      const cls = future ? 'future' : (isPaid ? 'paid' : 'unpaid');
-      const click = future ? '' : `onclick="toggleMonth(${p.id},'${key}')"`;
-      return `<div class="mbox ${cls}" ${click} title="${mn} ${YEAR}">${mn.slice(0,1)}</div>`;
-    }).join('');
-    return `<div class="year-row">
-      <div class="year-player">
-        ${avatarEl(p, 22)}
-        <span>${p.name.split(' ')[0]}</span>
-      </div>
-      <div class="months-grid">${months}</div>
-    </div>`;
-  }).join('');
+function renderExpenseMetrics() {
+  const catTotals = {};
+  CATEGORIES.forEach(c => catTotals[c] = 0);
+  expenses.forEach(e => { catTotals[e.category] = (catTotals[e.category]||0) + e.amount; });
+  const total = expenses.reduce((s,e)=>s+e.amount,0);
+  document.getElementById('exp-metrics').innerHTML =
+    `<div class="metric-card"><div class="metric-label">Total expenses</div><div class="metric-value red">${total.toLocaleString()} EGP</div><div class="metric-sub">${expenses.length} records</div></div>` +
+    CATEGORIES.map(c => `<div class="metric-card"><div class="metric-label">${c}</div><div class="metric-value" style="font-size:20px">${(catTotals[c]||0).toLocaleString()} EGP</div></div>`).join('');
 }
 
-function openAdd() {
-  editId = null; pendingPhoto = '';
-  clearForm();
-  document.getElementById('modal-title').textContent = 'Add Player';
-  document.getElementById('photo-wrap').innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Add photo</span>`;
-  document.getElementById('modal-backdrop').classList.add('open');
+function renderExpenses() {
+  const cat = document.getElementById('exp-cat-filter')?.value || 'all';
+  const monthVal = document.getElementById('exp-month-filter')?.value || 'all';
+  const q = (document.getElementById('exp-search')?.value || '').toLowerCase();
+  const now = new Date();
+  const filtered = expenses.filter(e => {
+    const catOk = cat === 'all' || e.category === cat;
+    const qOk = !q || e.description?.toLowerCase().includes(q) || e.category?.toLowerCase().includes(q);
+    let monthOk = true;
+    if (monthVal !== 'all') {
+      const d = new Date(e.date);
+      monthOk = d.getMonth() === parseInt(monthVal) && d.getFullYear() === now.getFullYear();
+    }
+    return catOk && qOk && monthOk;
+  }).sort((a,b) => new Date(b.date) - new Date(a.date));
+
+  const tbody = document.getElementById('expenses-tbody');
+  const empty = document.getElementById('expenses-empty');
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block'; return;
+  }
+  empty.style.display = 'none';
+  tbody.innerHTML = filtered.map(e => `
+    <tr>
+      <td style="color:var(--muted);font-size:13px">${e.date ? new Date(e.date).toLocaleDateString('en-GB') : '—'}</td>
+      <td><span class="expense-cat-badge ${CAT_CLASSES[e.category]||'cat-other'}">${e.category}</span></td>
+      <td>${e.description || '—'}</td>
+      <td style="font-weight:600; color:var(--danger)">${(e.amount||0).toLocaleString()} EGP</td>
+      <td>
+        <div class="inline-actions">
+          <button class="btn btn-sm btn-outline" onclick="editExpense('${e.id}')">✏️</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteExpense('${e.id}')">🗑</button>
+        </div>
+      </td>
+    </tr>`).join('');
 }
-function openEdit(id) {
-  editId = id;
-  const p = players.find(x => x.id === id);
-  pendingPhoto = p.photo || '';
-  document.getElementById('f-name').value   = p.name;
-  document.getElementById('f-num').value    = p.num;
-  document.getElementById('f-pos').value    = p.pos;
-  document.getElementById('f-phone').value  = p.phone || '';
-  document.getElementById('f-email').value  = p.email || '';
-  document.getElementById('f-amount').value = p.amount || '';
-  document.getElementById('modal-title').textContent = 'Edit Player';
-  const pw = document.getElementById('photo-wrap');
-  pw.innerHTML = p.photo
-    ? `<img src="${p.photo}" style="width:80px;height:80px;object-fit:cover;border-radius:50%" alt="">`
-    : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Add photo</span>`;
-  document.getElementById('modal-backdrop').classList.add('open');
+
+function editExpense(id) {
+  const e = expenses.find(x => x.id === id);
+  if (!e) return;
+  editingExpense = id;
+  document.getElementById('expense-modal-title').textContent = 'Edit expense';
+  document.getElementById('e-cat').value = e.category;
+  document.getElementById('e-amount').value = e.amount;
+  document.getElementById('e-desc').value = e.description;
+  document.getElementById('e-date').value = e.date;
+  document.getElementById('modal-expense').classList.add('open');
 }
-function closeModal() { document.getElementById('modal-backdrop').classList.remove('open'); }
-function clearForm() {
-  ['f-name','f-num','f-phone','f-email','f-amount'].forEach(i => document.getElementById(i).value = '');
-  document.getElementById('f-pos').value = 'MID';
-}
-function handlePhoto(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const r = new FileReader();
-  r.onload = ev => {
-    pendingPhoto = ev.target.result;
-    document.getElementById('photo-wrap').innerHTML = `<img src="${pendingPhoto}" style="width:80px;height:80px;object-fit:cover;border-radius:50%" alt="">`;
+
+function saveExpense() {
+  const amount = parseFloat(document.getElementById('e-amount').value);
+  if (!amount || amount <= 0) { alert('Enter a valid amount'); return; }
+  const data = {
+    id: editingExpense || Date.now().toString(),
+    category: document.getElementById('e-cat').value,
+    amount,
+    description: document.getElementById('e-desc').value.trim(),
+    date: document.getElementById('e-date').value,
   };
-  r.readAsDataURL(file);
-}
-function savePlayer() {
-  const name = document.getElementById('f-name').value.trim();
-  if (!name) { alert('Player name is required.'); return; }
-  const obj = {
-    id: editId || nextId++,
-    name,
-    num:    parseInt(document.getElementById('f-num').value) || 0,
-    pos:    document.getElementById('f-pos').value,
-    phone:  document.getElementById('f-phone').value.trim(),
-    email:  document.getElementById('f-email').value.trim(),
-    amount: parseFloat(document.getElementById('f-amount').value) || 0,
-    photo:  pendingPhoto,
-    fees:   editId ? (players.find(x=>x.id===editId)||{}).fees || {} : {}
-  };
-  if (editId) { const i = players.findIndex(x=>x.id===editId); players[i] = obj; }
-  else players.push(obj);
-  closeModal(); renderSquad(); renderFees();
-}
-function delPlayer(id) {
-  if (!confirm('Remove this player from the squad?')) return;
-  players = players.filter(x => x.id !== id);
-  renderSquad(); renderFees();
-}
-function showTab(t, btn) {
-  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-  document.getElementById(t).classList.add('active');
-  btn.classList.add('active');
-  if (t === 'fees') renderFees();
+  if (editingExpense) {
+    const idx = expenses.findIndex(e => e.id === editingExpense);
+    if (idx !== -1) expenses[idx] = data;
+  } else {
+    expenses.push(data);
+  }
+  save();
+  closeModal('expense');
+  renderExpenses();
+  renderExpenseMetrics();
+  renderDashboard();
 }
 
-buildMonthSel();
-renderSquad();
+function deleteExpense(id) {
+  if (!confirm('Delete this expense?')) return;
+  expenses = expenses.filter(e => e.id !== id);
+  save();
+  renderExpenses();
+  renderExpenseMetrics();
+  renderDashboard();
+}
+
+// ═══════════════════════════ INIT ════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('dash-date').textContent = '';
+  initPayYears();
+  initExpMonthFilter();
+  renderDashboard();
+  // close modals on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+  });
+});
 </script>
 </body>
 </html>
